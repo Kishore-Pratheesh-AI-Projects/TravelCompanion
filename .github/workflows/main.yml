@@ -1,0 +1,53 @@
+name: Build and Deploy Travel Planner
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-2
+        
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+      
+    - name: Build, tag, and push image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: pratheesh/travelplanner
+        IMAGE_TAG: latest
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --platform linux/amd64 .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ec2-user
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 940482450223.dkr.ecr.us-east-2.amazonaws.com
+          docker pull 940482450223.dkr.ecr.us-east-2.amazonaws.com/pratheesh/travelplanner:latest
+          docker stop travelplanner || true
+          docker rm travelplanner || true
+          docker run -d -p 3001:7860 \
+            -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+            -e SERPER_API_KEY=${{ secrets.SERPER_API_KEY }} \
+            -e WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }} \
+            -e AMADEUS_API_KEY=${{ secrets.AMADEUS_API_KEY }} \
+            -e AMADEUS_API_SECRET=${{ secrets.AMADEUS_API_SECRET }} \
+            --name travelplanner \
+            940482450223.dkr.ecr.us-east-2.amazonaws.com/pratheesh/travelplanner:latest
