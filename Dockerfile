@@ -25,4 +25,4 @@ ENV AMADEUS_API_SECRET=${AMADEUS_API_SECRET}
 EXPOSE 7860
 
 # Run Gradio app
-CMD ["python3", "app.py"]
+CMD ["python", "app.py"]
