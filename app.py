@@ -221,12 +221,16 @@ def generate_travel_plan(
     except Exception as e:
         import traceback
         error_trace = traceback.format_exc()
+        
+        # Fix for the f-string issue - create the progress list separately
+        progress_list = ''.join([f'- {msg}\n' for msg in progress_messages])
+        
         error_message = (
             f"# Error Creating Travel Plan\n\n"
             f"An error occurred while generating your travel plan: {str(e)}\n\n"
             f"```\n{error_trace}\n```\n\n"
             f"Progress before error:\n"
-            f"{''.join([f'- {msg}\n' for msg in progress_messages])}"
+            f"{progress_list}"
         )
         return error_message, "An error occurred during planning", ""
 
@@ -330,4 +334,4 @@ def create_gradio_app():
 if __name__ == "__main__":
     # Create and launch the app
     app = create_gradio_app()
-    app.launch(share=APP_SETTINGS["share"])
+    app.launch(share=APP_SETTINGS["share"],server_name="0.0.0.0")
