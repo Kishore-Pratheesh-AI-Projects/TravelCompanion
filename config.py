@@ -7,7 +7,11 @@ import os
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
+print(f"Env file found and loaded: {os.path.exists('.env')}")
 load_dotenv()
+
+
+
 
 # Required API keys
 REQUIRED_ENV_VARS = [
@@ -44,8 +48,7 @@ def setup_env():
         print("Please add them to your .env file")
         return False
     
-    # Set up OpenAI API key for llama_index
-    os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+
     
     return True
 
@@ -56,3 +59,4 @@ APP_SETTINGS = {
     "theme": "soft",  # Gradio theme
     "share": True,    # Whether to create a public link
 }
+
