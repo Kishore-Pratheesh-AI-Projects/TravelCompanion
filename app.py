@@ -333,5 +333,9 @@ def create_gradio_app():
 
 if __name__ == "__main__":
     # Create and launch the app
-    app = create_gradio_app()
+    app = create_gradio_app() 
     app.launch(share=APP_SETTINGS["share"],server_name="0.0.0.0")
+
+    """
+    Test comment to check if the deployment works correctly and the CI-CD pipeline is functioning.
+    """
