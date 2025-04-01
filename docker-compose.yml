@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  travelplanner:
+    image: 940482450223.dkr.ecr.us-east-2.amazonaws.com/pratheesh/travelplanner:latest
+    ports:
+      - "3001:7860"
+    environment:
+       -e OPENAI_API_KEY=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 -e SERPER_API_KEY=8ee41af64b66ec93b31aeb35625bc85f4cf166e4 -e WEATHER_API_KEY=e06e683f98754a7a92655432253003 -e AMADEUS_API_KEY=XnbNTbwppk1Apa1QO4CFdpMcL1AErnIJ -e AMADEUS_API_SECRET=5HjXpRR38qi4w8T8
+    restart: unless-stopped
